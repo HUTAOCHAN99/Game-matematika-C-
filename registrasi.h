@@ -1,5 +1,6 @@
-#include <iostream>
 #include <fstream>
+#include <vector>
+#include <iostream>
 using namespace std;
 // Bagian awal login
 // simpan data
@@ -29,8 +30,8 @@ bool handlinguserNameexists(const string &username)
     return false;
 }
 // daftar
-void registrasi();
-void registrasi()
+bool registrasi();
+bool registrasi()
 {
     UserData newUser;
 
@@ -38,11 +39,11 @@ void registrasi()
     cout << "Masukkan username : ";
     cin >> newUser.username;
 
-    // penanganan kesalahan data pengguna ganda
+    // error handling username sudah terdaftar
     if (handlinguserNameexists(newUser.username))
     {
         cout << "Username sudah terdaftar. Pilih username lain.\n";
-        return;
+        return false;
     }
 
     cout << "Masukkan password : ";
@@ -55,14 +56,15 @@ void registrasi()
     {
         file << newUser.username << " " << newUser.password << endl;
         file.close();
-        cout << "Registrasi berhasil.\n";
+        return true;
     }
     else
     {
-        cout << "Registrasi gagal, silakan coba beberapa saat lagi.\n";
+        return false;
     }
 }
 // login
+bool login(const string &username, const string &password);
 bool login(const string &username, const string &password)
 {
     ifstream file("savedata.txt");
@@ -82,4 +84,39 @@ bool login(const string &username, const string &password)
         file.close();
     }
     return false;
+}
+// display_account
+void displayaccount()
+{
+    ifstream file("savedata.txt");
+    if (file.is_open())
+    {
+        vector<UserData> users;
+        UserData user;
+
+        while (file >> user.username >> user.password)
+        {
+            users.push_back(user);
+        }
+        file.close();
+
+        if (!users.empty())
+        {
+            cout << "Daftar akun yang tersimpan:\n";
+            int l = 0;
+            for (const auto &u : users)
+            {
+                cout << "Username " << l << " : " << u.username << endl;
+                l++;
+            }
+        }
+        else
+        {
+            cout << "Tidak ada akun yang tersimpan.\n";
+        }
+    }
+    else
+    {
+        cout << "Gagal membuka file data savedata.txt.\n";
+    }
 }
